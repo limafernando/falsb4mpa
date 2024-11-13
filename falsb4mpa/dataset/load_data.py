@@ -6,13 +6,23 @@ import pandas as pd
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-VALID_DATA_NAMES = ['adult', 'adult-race', 'german', 'titanic', 'heritage-health']
+
+VALID_DATA_NAMES = ['adult', 'adult-race', 'german', 'titanic', 'heritage-health', 'adult-mpa']
 VALID_FILE_NAMES = {
     'adult':'adult', 
     'adult-race':'adult', 
     'german':'german', 
     'titanic':'titanic', 
-    'heritage-health':'heritage-health'
+    'heritage-health':'heritage-health',
+    'adult-mpa': 'adult_mpa'
+}
+VALID_FOLDER_NAMES = {
+    'adult':'adult', 
+    'adult-race':'adult', 
+    'german':'german', 
+    'titanic':'titanic', 
+    'heritage-health':'heritage-health',
+    'adult-mpa': 'adult'
 }
 VALID_LEARNING_STEPS = ['train', 'valid', 'test']
 ACCESS_INDEXES = {
@@ -20,14 +30,16 @@ ACCESS_INDEXES = {
     'adult-race':[slice(-1), -1, slice(63, 68)],
     'german':[slice(-1), -1, -2],
     'titanic':[slice(-1), -1, -2],
-    'heritage-health':[]
+    'heritage-health':[],
+    'adult-mpa':[slice(-1), -1, slice(106, 116)]
 }
 DIMENSIONS = {
     'adult': [112, 1, 1], #[X, Y, A]
     'adult-race': [112, 1, 5], 
     'german': [31, 1, 1], 
     'titanic': [19, 1, 1], 
-    'heritage-health':'heritage-health'
+    'heritage-health':'heritage-health',
+    'adult-mpa': [116, 1, 10]
 }
 
 
@@ -63,7 +75,7 @@ def load_data(data_name, learning_step=None, kind='np'):
         return select_data_step_pd(learning_step, access_indexes, data_folder, data_name)
 
 def select_data_folder(data_name):
-    return os.path.join(ROOT_DIR, Path(r'../data/{}'.format(VALID_FILE_NAMES[data_name])))
+    return os.path.join(ROOT_DIR, Path(f'../../data/processed/{VALID_FOLDER_NAMES[data_name]}'.format()))
 
 
 def get_access_indexes(data_name):
@@ -71,7 +83,7 @@ def get_access_indexes(data_name):
 
 
 def select_data_step_np(learning_step, access_indexes, data_folder, data_name):
-    file = os.path.join(data_folder, Path(r'post_prep/{}.csv'.format(learning_step)))
+    file = os.path.join(data_folder, Path(f'{learning_step}.csv'))
     data = np.genfromtxt(file, delimiter=',', skip_header=True)[:, 1:]
 
     num_examples = data.shape[0]
@@ -82,7 +94,7 @@ def select_data_step_np(learning_step, access_indexes, data_folder, data_name):
     return x, y, a
 
 def select_data_step_pd(learning_step, access_indexes, data_folder, data_name):
-    file = os.path.join(data_folder, Path(r'post_prep/{}.csv'.format(learning_step)))
+    file = os.path.join(data_folder, Path(f'{learning_step}.csv'))
     
     data = pd.read_csv(file)
     
