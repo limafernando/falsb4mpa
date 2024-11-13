@@ -7,14 +7,15 @@ import pandas as pd
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-VALID_DATA_NAMES = ['adult', 'adult-race', 'german', 'titanic', 'heritage-health', 'adult-mpa']
+VALID_DATA_NAMES = ['adult', 'adult-race', 'german', 'titanic', 'heritage-health', 'adult-mpa', 'adult-mpa-balanced']
 VALID_FILE_NAMES = {
     'adult':'adult', 
     'adult-race':'adult', 
     'german':'german', 
     'titanic':'titanic', 
     'heritage-health':'heritage-health',
-    'adult-mpa': 'adult_mpa'
+    'adult-mpa': 'adult_mpa',
+    'adult-mpa-balanced': 'adult_mpa_balanced'
 }
 VALID_FOLDER_NAMES = {
     'adult':'adult', 
@@ -22,7 +23,8 @@ VALID_FOLDER_NAMES = {
     'german':'german', 
     'titanic':'titanic', 
     'heritage-health':'heritage-health',
-    'adult-mpa': 'adult'
+    'adult-mpa': 'adult',
+    'adult-mpa-balanced': 'adult'
 }
 VALID_LEARNING_STEPS = ['train', 'valid', 'test']
 ACCESS_INDEXES = {
@@ -31,7 +33,8 @@ ACCESS_INDEXES = {
     'german':[slice(-1), -1, -2],
     'titanic':[slice(-1), -1, -2],
     'heritage-health':[],
-    'adult-mpa':[slice(-1), -1, slice(106, 116)]
+    'adult-mpa':[slice(-1), -1, slice(106, 116)],
+    'adult-mpa-balanced':[slice(-1), -1, slice(106, 116)]
 }
 DIMENSIONS = {
     'adult': [112, 1, 1], #[X, Y, A]
@@ -39,7 +42,8 @@ DIMENSIONS = {
     'german': [31, 1, 1], 
     'titanic': [19, 1, 1], 
     'heritage-health':'heritage-health',
-    'adult-mpa': [116, 1, 10]
+    'adult-mpa': [116, 1, 10],
+    'adult-mpa-balanced': [116, 1, 10]
 }
 
 
