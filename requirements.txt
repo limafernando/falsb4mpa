@@ -9,4 +9,5 @@ seaborn
 scikit-learn
 matplotlib
 tensorflow
+imblearn
 -e .
