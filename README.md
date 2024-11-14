@@ -1,3 +1,4 @@
+<!---
 # falsb4mpa
 
 <a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
@@ -58,4 +59,9 @@ A short description of the project.
 ```
 
 --------
+-->
 
+# FALSB4MPA
+The FALSB4MPA is mine PhD research project aiming to compare some adversarial strategies for fairness in machine learning.
+
+FALSB4MPA is related to the [FALSB](https://github.com/limafernando/falsb) project.

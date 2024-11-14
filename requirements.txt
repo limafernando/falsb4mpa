@@ -6,5 +6,8 @@ python-dotenv
 numpy
 pandas
 seaborn
-sklearn
+scikit-learn
+matplotlib
+tensorflow
+imblearn
 -e .
