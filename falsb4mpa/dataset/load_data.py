@@ -15,14 +15,14 @@ VALID_FILE_NAMES = {
 VALID_FOLDER_NAMES = {"adult-mpa-bin-agg": "adult", "adult-mpa-bin-wout-agg": "adult"}
 VALID_LEARNING_STEPS = ["train", "valid", "test"]
 ACCESS_INDEXES = {
-    # dataset-name: [X, Y, A]
-    "adult-mpa-bin-agg": [slice(-1), -1, 1],  # A como subconjunto de X
-    "adult-mpa-bin-wout-agg": [slice(-1), -1, slice(1, 3)],  # limite superior não incluso
+    # dataset-name: [X, Y, A1, A2] - A como subconjunto de X
+    "adult-mpa-bin-agg": [slice(-1), -1, 1],  # Em casos com agg tem apenas um A
+    "adult-mpa-bin-wout-agg": [slice(-1), -1, 1, 2],
 }
 DIMENSIONS = {
-    # dataset-name: [X, Y, A]
+    # dataset-name: [X, Y, A1, A2]
     "adult-mpa-bin-agg": [116, 1, 1],
-    "adult-mpa-bin-wout-agg": [116, 1, 2],
+    "adult-mpa-bin-wout-agg": [116, 1, 1, 1],
 }
 
 
@@ -75,9 +75,10 @@ def select_data_step_np(learning_step, access_indexes, data_folder, data_name):
     num_examples = data.shape[0]
     x = data[:, access_indexes[0]]
     y = data[:, access_indexes[1]].reshape(num_examples, DIMENSIONS[data_name][1])
-    a = data[:, access_indexes[2]].reshape(num_examples, DIMENSIONS[data_name][2])
+    a1 = data[:, access_indexes[2]].reshape(num_examples, DIMENSIONS[data_name][2])
+    a2 = data[:, access_indexes[2]].reshape(num_examples, DIMENSIONS[data_name][2])
 
-    return x, y, a
+    return x, y, a1, a2
 
 
 def select_data_step_pd(learning_step, access_indexes, data_folder, data_name):
