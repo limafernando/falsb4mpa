@@ -17,7 +17,7 @@ VALID_LEARNING_STEPS = ["train", "valid", "test"]
 ACCESS_INDEXES = {
     # dataset-name: [X, Y, A]
     "adult-mpa-bin-agg": [slice(-1), -1, 1],  # A como subconjunto de X
-    "adult-mpa-bin-wout-agg": [slice(-1), -1, slice(1, 3)],
+    "adult-mpa-bin-wout-agg": [slice(-1), -1, slice(1, 3)],  # limite superior não incluso
 }
 DIMENSIONS = {
     # dataset-name: [X, Y, A]
