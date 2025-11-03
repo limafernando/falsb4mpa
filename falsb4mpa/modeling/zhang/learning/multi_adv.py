@@ -1,12 +1,13 @@
+from copy import deepcopy
 from math import isnan
 
 
 import numpy as np
 import tensorflow as tf
-from tensorflow.python.keras.optimizers import adam_v2
+from tensorflow.keras.optimizers import Adam
 
 
-from evaluation import metrics
+from falsb4mpa.evaluation import metrics
 from falsb4mpa.modeling.zhang.models.multi_adv import ZhangMultAdv
 
 
@@ -27,7 +28,15 @@ def train(model: ZhangMultAdv, X, Y, A1, A2, optimizer, alpha=1):
     adv_vars = [model.adv1.U, model.adv1.c, model.adv2.U, model.adv2.c, model.b]
     clf_vars = [model.clf.W, model.b]
 
-    with tf.GradientTape() as adv_tape, tf.GradientTape(persistent=True) as clf_tape:
+    clf_opt = deepcopy(optimizer)
+    adv1_opt = deepcopy(optimizer)
+    adv2_opt = deepcopy(optimizer)
+
+    with (
+        tf.GradientTape() as adv1_tape,
+        tf.GradientTape() as adv2_tape,
+        tf.GradientTape(persistent=True) as clf_tape,
+    ):
 
         model(X, Y, A1, A2)  # to compute the foward
         adv1_loss = model.adv1_loss  # current adversarial loss
@@ -39,11 +48,11 @@ def train(model: ZhangMultAdv, X, Y, A1, A2, optimizer, alpha=1):
         print("any loss is NaN")
         return True
 
-    dULa1 = adv_tape.gradient(adv1_loss, adv_vars)  # adv_grads
-    optimizer.apply_gradients(zip(dULa1, adv_vars))
+    dULa1 = adv1_tape.gradient(adv1_loss, adv_vars)  # adv_grads
+    adv1_opt.apply_gradients(zip(dULa1, adv_vars))
 
-    dULa2 = adv_tape.gradient(adv2_loss, adv_vars)  # adv_grads
-    optimizer.apply_gradients(zip(dULa2, adv_vars))
+    dULa2 = adv2_tape.gradient(adv2_loss, adv_vars)  # adv_grads
+    adv2_opt.apply_gradients(zip(dULa2, adv_vars))
 
     dWLp = clf_tape.gradient(clf_loss, clf_vars)  # regular grads for classifier
 
@@ -70,6 +79,8 @@ def train(model: ZhangMultAdv, X, Y, A1, A2, optimizer, alpha=1):
     for i in range(len(dWLa1)):
         clas_grads.append(tf.subtract(dWLp[i], proj_minus_max_adv_loss[i]))
 
+    clf_opt.apply_gradients(zip(clas_grads, clf_vars))  # For adv1
+
     proj_dWLa_dWLp2 = (
         []
     )  # prevents the classifier from moving in a direction that helps the adversary decrease its loss
@@ -88,7 +99,7 @@ def train(model: ZhangMultAdv, X, Y, A1, A2, optimizer, alpha=1):
     for i in range(len(dWLa2)):
         clas_grads.append(tf.subtract(dWLp[i], proj_minus_max_adv_loss[i]))
 
-    optimizer.apply_gradients(zip(clas_grads, clf_vars))
+    clf_opt.apply_gradients(zip(clas_grads, clf_vars))  # For adv2
 
     model(X, Y, A1, A2)  # to compute the foward
     return False
@@ -118,7 +129,7 @@ def train_loop(model: ZhangMultAdv, raw_data, train_dataset, epochs, opt=None):
 
         if decay4epoch:
             lr = 0.001 / (epoch + 1)
-            optimizer = adam_v2(learning_rate=lr)
+            optimizer = Adam(learning_rate=lr)
 
         for X, Y, A1, A2 in train_dataset:
 
@@ -144,7 +155,7 @@ def train_loop(model: ZhangMultAdv, raw_data, train_dataset, epochs, opt=None):
         adv2_acc = adv2_acc / dataset_size
 
         print(
-            "> Epoch: {} | Clf loss/acc {}/{} | Adv1 loss/acc {}/{} | Adv2 loss/acc {}/{}".format(
+            "> Epoch: {} | Clf loss/acc {:.2f}/{:.2f} | Adv1 loss/acc {:.2f}/{:.2f} | Adv2 loss/acc {:.2f}/{:.2f}".format(
                 epoch + 1, clf_loss, clf_acc, adv1_loss, adv1_acc, adv2_loss, adv2_acc
             )
         )

@@ -19,7 +19,7 @@ class ZhangMultAdv:
 
         self.clf = Classifier(xdim, ydim)
 
-        adv = self.get_adv_model(self.fairdef)
+        adv = self.get_adv_model(self.fairdef)  # TODO: check if need double instantiation
         self.adv1 = adv(a1dim)  # initializing the adversarial-1 object
         self.adv2 = adv(a2dim)  # initializing the adversarial-2 object
 
