@@ -126,22 +126,24 @@ def evaluation(model, data):
     A_real = None
     batch_count = 1
 
-    for X, Y, A in data:
+    for X, Y, A1, A2 in data:
 
-        model(X, Y, A)
+        model(X, Y, A1, A2)
 
         if batch_count == 1:
             Y_hat = model.Y_hat
             Y_real = Y
-            A_real = A
+            A1_real = A1
+            A2_real = A2
             batch_count += 1
         else:
             Y_hat = tf.concat([Y_hat, model.Y_hat], 0)
 
             Y_real = tf.concat([Y_real, Y], 0)
-            A_real = tf.concat([A_real, A], 0)
+            A1_real = tf.concat([A1_real, A1], 0)
+            A2_real = tf.concat([A2_real, A2], 0)
 
-    return Y_real, A_real, Y_hat
+    return Y_real, A1_real, A2_real, Y_hat
 
 
 def compute_tradeoff(performance_metric, fairness_metric):
