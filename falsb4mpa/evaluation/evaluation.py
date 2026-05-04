@@ -1,7 +1,13 @@
 import tensorflow as tf
 import numpy as np
 
-from falsb4mpa.evaluation import metrics
+from falsb4mpa.evaluation import (
+    baseline_metrics,
+    intersectional_fairness_metrics,
+    group_fairness_metrics,
+    grouping_functions,
+)
+from falsb4mpa.evaluation.predictive_metrics import f1_macro, f1_micro
 from falsb4mpa.modeling.zhang.models.multi_adv import ZhangMultAdv
 
 
@@ -37,31 +43,22 @@ def fair_evaluation(model: ZhangMultAdv, data):
     return Y_real, A1_real, A2_real, Y_hat, A1_hat, A2_hat
 
 
-def compute_metrics(Y, A, Y_hat, A_hat=None, adim=1):
-    print("> Evaluation")
+def compute_predictive_metrics(Y, Y_hat):
+    print("> Predictive Performance Evaluation")
     # Y = Y.numpy()
     # A = A.numpy()
 
     Y_hat = tf.math.round(Y_hat)
-    clas_acc = metrics.accuracy(Y, Y_hat)
+    clas_acc = baseline_metrics.accuracy(Y, Y_hat)
     print("> Class Acc = {}".format(clas_acc))
 
-    if A_hat is not None:
-        A_hat = tf.math.round(A_hat)
-        adv_acc = metrics.accuracy(A, A_hat)
-        print("> Adv Acc = {}".format(clas_acc, adv_acc))
+    clas_f1_micro = f1_micro(Y, Y_hat)
+    clas_f1_macro = f1_macro(Y, Y_hat)
 
-    dp = metrics.DP(Y_hat.numpy(), A, adim)
-    deqodds = metrics.DEqOdds(Y, Y_hat.numpy(), A, adim)
-    deqopp = metrics.DEqOpp(Y, Y_hat.numpy(), A, adim)
-
-    print("> DP | DEqOdds | DEqOpp")
-    print("> {} | {} | {}".format(dp, deqodds, deqopp))
-
-    tp = metrics.TP(Y, Y_hat.numpy())
-    tn = metrics.TN(Y, Y_hat.numpy())
-    fp = metrics.FP(Y, Y_hat.numpy())
-    fn = metrics.FN(Y, Y_hat.numpy())
+    tp = baseline_metrics.TP(Y, Y_hat.numpy())
+    tn = baseline_metrics.TN(Y, Y_hat.numpy())
+    fp = baseline_metrics.FP(Y, Y_hat.numpy())
+    fn = baseline_metrics.FN(Y, Y_hat.numpy())
 
     confusion_matrix = np.array([[tn, fp], [fn, tp]])
 
@@ -71,11 +68,56 @@ def compute_metrics(Y, A, Y_hat, A_hat=None, adim=1):
         + "FN: {} | TP: {}".format(fn, tp)
     )
 
+    return clas_acc, clas_f1_micro, clas_f1_macro, confusion_matrix
+
+
+def compute_adv_metrics(A, A_hat=None):
+    if A_hat is not None:
+        A_hat = tf.math.round(A_hat)
+        adv_acc = baseline_metrics.accuracy(A, A_hat)
+        print("> Adv Acc = {}".format(adv_acc))
+
+    return adv_acc
+
+
+def compute_fair_metrics(Y, A, Y_hat, adim=1):
+    print("> Fairness Evaluation")
+    # Y = Y.numpy()
+    # A = A.numpy()
+
+    Y_hat = tf.math.round(Y_hat)
+
+    dp = group_fairness_metrics.DP(Y_hat.numpy(), A, adim)
+    deqodds = group_fairness_metrics.DEqOdds(Y, Y_hat.numpy(), A, adim)
+    deqopp = group_fairness_metrics.DEqOpp(Y, Y_hat.numpy(), A, adim)
+
+    print("> DP | DEqOdds | DEqOpp")
+    print("> {} | {} | {}".format(dp, deqodds, deqopp))
+
     if adim == 1:
         metrics_g0, metrics_g1 = group_confusion_matrix(A, Y, Y_hat)
-        return clas_acc, dp, deqodds, deqopp, confusion_matrix, metrics_g0, metrics_g1
+        return dp, deqodds, deqopp, metrics_g0, metrics_g1
 
-    return clas_acc, dp, deqodds, deqopp, confusion_matrix  # , metrics_g0, metrics_g1
+    return dp, deqodds, deqopp  # , metrics_g0, metrics_g1
+
+
+def compute_intersectional_fair_metrics(Y, A1, A2, Y_hat, a1dim=1, a2dim=1):
+    print("> Intersectional Fairness Evaluation")
+
+    Y_hat = tf.math.round(Y_hat)
+
+    wc_spd = intersectional_fairness_metrics.wc_spd(Y_hat, A1, a1dim, A2, a2dim)
+    wc_aod = intersectional_fairness_metrics.wc_aod(Y, Y_hat, A1, a1dim, A2, a2dim)
+    wc_eod = intersectional_fairness_metrics.wc_eod(Y, Y_hat, A1, a1dim, A2, a2dim)
+
+    wc_spd = intersectional_fairness_metrics.opt_wc_spd(wc_spd)
+    wc_aod = intersectional_fairness_metrics.opt_wc_aod(wc_aod)
+    wc_eod = intersectional_fairness_metrics.opt_wc_eod(wc_eod)
+
+    print("> WC_SPD | WC_AOD | WC_EOD")
+    print("> {} | {} | {}".format(wc_spd, wc_aod, wc_eod))
+
+    return wc_spd, wc_aod, wc_eod
 
 
 def evaluation(model, data):
@@ -108,13 +150,18 @@ def compute_tradeoff(performance_metric, fairness_metric):
 
 
 def group_confusion_matrix(A, Y, Y_hat):
-    fn_metrics = [metrics.TN, metrics.FP, metrics.FN, metrics.TP]
+    fn_metrics = [
+        baseline_metrics.TN,
+        baseline_metrics.FP,
+        baseline_metrics.FN,
+        baseline_metrics.TP,
+    ]
     # if adim == 1:
     metrics_a0 = [0, 0, 0, 0]
     metrics_a1 = [0, 0, 0, 0]
     for i in range(len(fn_metrics)):
-        metrics_a0[i] = metrics.subgroup(fn_metrics[i], A, Y, Y_hat.numpy())
-        metrics_a1[i] = metrics.subgroup(fn_metrics[i], 1 - A, Y, Y_hat.numpy())
+        metrics_a0[i] = grouping_functions.subgroup(fn_metrics[i], A, Y, Y_hat.numpy())
+        metrics_a1[i] = grouping_functions.subgroup(fn_metrics[i], 1 - A, Y, Y_hat.numpy())
 
     print(
         "> Confusion Matrix for A = 0 \n"
