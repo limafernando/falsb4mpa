@@ -7,7 +7,7 @@ import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
 
 
-from falsb4mpa.evaluation import metrics
+from falsb4mpa.evaluation import baseline_metrics
 from falsb4mpa.modeling.zhang.models.multi_adv import ZhangMultAdv
 
 
@@ -143,9 +143,9 @@ def train_loop(model: ZhangMultAdv, raw_data, train_dataset, epochs, opt=None):
             Y_hat = model.Y_hat
             A1_hat = model.A1_hat
             A2_hat = model.A2_hat
-            clf_acc += metrics.accuracy(Y, tf.math.round(Y_hat))
-            adv1_acc += metrics.accuracy(A1, tf.math.round(A1_hat))
-            adv2_acc += metrics.accuracy(A2, tf.math.round(A2_hat))
+            clf_acc += baseline_metrics.accuracy(Y, tf.math.round(Y_hat))
+            adv1_acc += baseline_metrics.accuracy(A1, tf.math.round(A1_hat))
+            adv2_acc += baseline_metrics.accuracy(A2, tf.math.round(A2_hat))
 
         clf_loss = model.clf_loss
         adv1_loss = model.adv1_loss

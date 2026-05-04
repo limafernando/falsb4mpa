@@ -1,5 +1,5 @@
 import tensorflow as tf
-from falsb4mpa.evaluation import metrics
+from falsb4mpa.evaluation import group_fairness_metrics
 
 def train(model, X, Y, A, optimizer):
     
@@ -55,9 +55,9 @@ def train_loop(model, raw_data, train_dataset, epochs, optmizer):
             Y_hat = model.Y_hat
             A_hat = model.A_hat
             X_hat = model.X_hat
-            clas_acc += metrics.accuracy(Y, tf.math.round(Y_hat))
-            adv_acc += metrics.accuracy(A, tf.math.round(A_hat))
-            dec_acc += metrics.accuracy(X, X_hat)
+            clas_acc += group_fairness_metrics.accuracy(Y, tf.math.round(Y_hat))
+            adv_acc += group_fairness_metrics.accuracy(A, tf.math.round(A_hat))
+            dec_acc += group_fairness_metrics.accuracy(X, X_hat)
 
         model_loss = tf.reduce_mean(model.loss)
         clas_loss = tf.reduce_mean(model.clas_loss)
