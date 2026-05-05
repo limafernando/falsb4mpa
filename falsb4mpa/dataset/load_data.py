@@ -7,22 +7,29 @@ import pandas as pd
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-VALID_DATA_NAMES = ["adult-mpa-bin-agg", "adult-mpa-bin-wout-agg"]
+VALID_DATA_NAMES = ["adult-mpa-bin-agg", "adult-mpa-bin-wout-agg", "adult-mpa-cat-wout-agg"]
 VALID_FILE_NAMES = {
     "adult-mpa-bin-agg": "adult_mpa_bin_with_agg",
     "adult-mpa-bin-wout-agg": "adult_mpa_bin_wout_agg",
+    "adult-mpa-cat-wout-agg": "adult_mpa_cat_wout_agg",
 }
-VALID_FOLDER_NAMES = {"adult-mpa-bin-agg": "adult", "adult-mpa-bin-wout-agg": "adult"}
+VALID_FOLDER_NAMES = {
+    "adult-mpa-bin-agg": "adult",
+    "adult-mpa-bin-wout-agg": "adult",
+    "adult-mpa-cat-wout-agg": "adult",
+}
 VALID_LEARNING_STEPS = ["train", "valid", "test"]
 ACCESS_INDEXES = {
     # dataset-name: [X, Y, A1, A2] - A como subconjunto de X
     "adult-mpa-bin-agg": [slice(-1), -1, 1],  # Em casos com agg tem apenas um A
     "adult-mpa-bin-wout-agg": [slice(-1), -1, 1, 2],
+    "adult-mpa-cat-wout-agg": [slice(-1), -1, 1, slice(2, 7)],
 }
 DIMENSIONS = {
     # dataset-name: [X, Y, A1, A2]
     "adult-mpa-bin-agg": [116, 1, 1],
-    "adult-mpa-bin-wout-agg": [116, 1, 1, 1],
+    "adult-mpa-bin-wout-agg": [97, 1, 1, 1],
+    "adult-mpa-cat-wout-agg": [102, 1, 1, 5],
 }
 
 
@@ -76,7 +83,7 @@ def select_data_step_np(learning_step, access_indexes, data_folder, data_name):
     x = data[:, access_indexes[0]]
     y = data[:, access_indexes[1]].reshape(num_examples, DIMENSIONS[data_name][1])
     a1 = data[:, access_indexes[2]].reshape(num_examples, DIMENSIONS[data_name][2])
-    a2 = data[:, access_indexes[3]].reshape(num_examples, DIMENSIONS[data_name][2])
+    a2 = data[:, access_indexes[3]].reshape(num_examples, DIMENSIONS[data_name][3])
 
     return x, y, a1, a2
 

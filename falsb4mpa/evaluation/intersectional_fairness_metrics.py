@@ -1,6 +1,6 @@
-from numpy import mean, where
+from numpy import mean, where, array
 from falsb4mpa.evaluation.baseline_metrics import FPR, PR, TPR
-from falsb4mpa.evaluation.grouping_functions import intersectional_subgroup
+from falsb4mpa.evaluation.grouping_functions import compute_intersectional_bin_cat_metric, intersectional_subgroup
 
 
 def wc_spd(y_hat, a1, a1dim, a2, a2dim):
@@ -13,9 +13,11 @@ def wc_spd(y_hat, a1, a1dim, a2, a2dim):
         sg_rates = [sg1_rate, sg2_rate, sg3_rate, sg4_rate]
 
         return max(sg_rates) - min(sg_rates)
-
+    
     else:
-        pass
+        sg_rates = compute_intersectional_bin_cat_metric(PR, a1, a2, a1dim, a2dim, y_hat)
+
+        return max(sg_rates) - min(sg_rates)
 
 
 def opt_wc_spd(wc_spd):
@@ -44,7 +46,12 @@ def wc_aod(y_real, y_hat, a1, a1dim, a2, a2dim):
         return (max(sg_rates) - min(sg_rates)) * 0.5
 
     else:
-        pass
+        sg_tpr_rates = compute_intersectional_bin_cat_metric(TPR, a1, a2, a1dim, a2dim, y_real, y_hat)
+        sg_fpr_rates = compute_intersectional_bin_cat_metric(FPR, a1, a2, a1dim, a2dim, y_real, y_hat)
+
+        sg_rates = array(sg_tpr_rates) + array(sg_fpr_rates)
+
+        return (max(sg_rates) - min(sg_rates)) * 0.5
 
 
 def opt_wc_aod(wc_aod):
@@ -64,8 +71,8 @@ def wc_eod(y_real, y_hat, a1, a1dim, a2, a2dim):
         return max(sg_rates) - min(sg_rates)
 
     else:
-        pass
-
+        sg_rates = compute_intersectional_bin_cat_metric(TPR, a1, a2, a1dim, a2dim, y_real, y_hat)
+        return max(sg_rates) - min(sg_rates)
 
 def opt_wc_eod(wc_eod):
     return 1 - wc_eod
