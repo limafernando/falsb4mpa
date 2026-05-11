@@ -1,3 +1,5 @@
+from itertools import combinations
+
 import numpy as np
 import tensorflow as tf
 
@@ -66,6 +68,23 @@ def categorical_subgroup(fn, Amask, adim, Y, Ypred=None, priviliged_idx=-1):
     #         group_difference = subgroup(fn, Amask[:, group_idx], Y, Ypred)
 
     # return group_difference
+
+
+def wc_categorical_subgroup(fn, Amask, adim, Y, Ypred=None):
+
+    groups_differences = []
+
+    idx_list = [idx for idx in range(adim)]
+
+    for g1_index, g2_index in combinations(idx_list, 2):
+
+        g1_result = subgroup(fn, Amask[:, g1_index], Y, Ypred)
+        g2_result = subgroup(fn, Amask[:, g2_index], Y, Ypred)
+
+        group_result = abs(g1_result - g2_result)
+        groups_differences.append(group_result)
+
+    return 1 - (max(groups_differences) - min(groups_differences))
 
 
 def intersectional_categorical_subgroup(fn, a1, a2, a1dim, a2dim, Y, Ypred=None):
