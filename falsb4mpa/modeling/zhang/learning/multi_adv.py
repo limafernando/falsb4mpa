@@ -165,4 +165,4 @@ def train_loop(model: ZhangMultAdv, raw_data, train_dataset, epochs, opt=None):
             )
         )
 
-    return r, dULa1, dULa2
+    return r, dULa1, dULa2, cos_sim
