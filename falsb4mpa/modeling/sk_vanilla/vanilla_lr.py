@@ -6,11 +6,18 @@ class VanillaLogisticRegression:
         self.epochs = epochs
         self.lr = lr
         self.model = SGDClassifier(
-            random_state=0, max_iter=self.epochs, learning_rate="constant", eta0=self.lr
+            loss="log_loss",  # logistic regression
+            max_iter=self.epochs,
+            learning_rate="constant",
+            eta0=self.lr,
+            shuffle=False,
         )
 
     def fit(self, X, y):
         self.model = self.model.fit(X, y)
+
+    def partial_fit(self, X, y, classes=[0, 1]):
+        self.model = self.model.partial_fit(X, y, classes=classes)
 
     def predict(self, X):
         return self.model.predict(X)
