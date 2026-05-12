@@ -5,6 +5,7 @@ from math import isnan
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 from falsb4mpa.evaluation import baseline_metrics
@@ -25,7 +26,8 @@ def projection(V, A):
 
 
 def train(model: ZhangMultAdv, X, Y, A1, A2, optimizer, alpha=1):
-    adv_vars = [model.adv1.U, model.adv1.c, model.adv2.U, model.adv2.c, model.b]
+    adv1_vars = [model.adv1.U, model.adv1.c, model.b]
+    adv2_vars = [model.adv2.U, model.adv2.c, model.b]
     clf_vars = [model.clf.W, model.b]
 
     clf_opt = deepcopy(optimizer)
@@ -48,11 +50,11 @@ def train(model: ZhangMultAdv, X, Y, A1, A2, optimizer, alpha=1):
         print("any loss is NaN")
         return True
 
-    dULa1 = adv1_tape.gradient(adv1_loss, adv_vars)  # adv_grads
-    adv1_opt.apply_gradients(zip(dULa1, adv_vars))
+    dULa1 = adv1_tape.gradient(adv1_loss, adv1_vars)  # adv_grads
+    adv1_opt.apply_gradients(zip(dULa1, adv1_vars))
 
-    dULa2 = adv2_tape.gradient(adv2_loss, adv_vars)  # adv_grads
-    adv2_opt.apply_gradients(zip(dULa2, adv_vars))
+    dULa2 = adv2_tape.gradient(adv2_loss, adv2_vars)  # adv_grads
+    adv2_opt.apply_gradients(zip(dULa2, adv2_vars))
 
     dWLp = clf_tape.gradient(clf_loss, clf_vars)  # regular grads for classifier
 
@@ -102,7 +104,7 @@ def train(model: ZhangMultAdv, X, Y, A1, A2, optimizer, alpha=1):
     clf_opt.apply_gradients(zip(clas_grads, clf_vars))  # For adv2
 
     model(X, Y, A1, A2)  # to compute the foward
-    return False
+    return False, dULa1, dULa2
 
 
 def train_loop(model: ZhangMultAdv, raw_data, train_dataset, epochs, opt=None):
@@ -133,7 +135,7 @@ def train_loop(model: ZhangMultAdv, raw_data, train_dataset, epochs, opt=None):
 
         for X, Y, A1, A2 in train_dataset:
 
-            r = train(model, X, Y, A1, A2, optimizer, alpha)
+            r, dULa1, dULa2 = train(model, X, Y, A1, A2, optimizer, alpha)
 
             if r:
                 print("broken loss")
@@ -153,9 +155,14 @@ def train_loop(model: ZhangMultAdv, raw_data, train_dataset, epochs, opt=None):
         clf_acc = clf_acc / dataset_size
         adv1_acc = adv1_acc / dataset_size
         adv2_acc = adv2_acc / dataset_size
+        cos_sim = cosine_similarity(
+            dULa1[2].numpy().reshape(1, -1), dULa2[2].numpy().reshape(1, -1)
+        )[0][0]
 
         print(
-            "> Epoch: {} | Clf loss/acc {:.2f}/{:.2f} | Adv1 loss/acc {:.2f}/{:.2f} | Adv2 loss/acc {:.2f}/{:.2f}".format(
-                epoch + 1, clf_loss, clf_acc, adv1_loss, adv1_acc, adv2_loss, adv2_acc
+            "> Epoch: {} | Clf loss/acc {:.2f}/{:.2f} | Adv1 loss/acc {:.2f}/{:.2f} | Adv2 loss/acc {:.2f}/{:.2f} | Cos Sim {:.2f}".format(
+                epoch + 1, clf_loss, clf_acc, adv1_loss, adv1_acc, adv2_loss, adv2_acc, cos_sim
             )
         )
+
+    return r, dULa1, dULa2
