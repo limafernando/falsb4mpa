@@ -7,7 +7,7 @@ EPS = 7e-8
 
 
 class Adversarial:
-    def __init__(self, initializer=GlorotNormal):
+    def __init__(self, adim=1, initializer=GlorotNormal):
 
         # self.ini = initializer()
         self.ini = RandomNormal(mean=0.0, stddev=1.5)
@@ -16,6 +16,7 @@ class Adversarial:
         self.is_built = False
         # self.c = tf.Variable(self.ini(shape=(1,1)), name='c')
         self.c = tf.Variable(tf.ones([1, 1]), name="c")
+        self.adim = adim
 
     def __call__(self):
         pass

@@ -19,10 +19,9 @@ def projection(V, A):
         return zeros
 
     else:
-        P = tf.multiply(V, A)
-        P = tf.multiply(P, V)
-        P = tf.divide(P, tf.norm(V))
-        return P
+        dot = tf.reduce_sum(V * A)
+        norm_sqr = tf.reduce_sum(A * A)
+        return (dot / norm_sqr) * A
 
 
 def train(model: ZhangMultAdv, X, Y, A1, A2, optimizer, alpha=1):
