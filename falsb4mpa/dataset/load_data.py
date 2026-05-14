@@ -7,16 +7,23 @@ import pandas as pd
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-VALID_DATA_NAMES = ["adult-mpa-bin-agg", "adult-mpa-bin-wout-agg", "adult-mpa-cat-wout-agg"]
+VALID_DATA_NAMES = [
+    "adult-mpa-bin-agg",
+    "adult-mpa-bin-wout-agg",
+    "adult-mpa-cat-wout-agg",
+    "german-mpa-bin-wout-agg",
+]
 VALID_FILE_NAMES = {
     "adult-mpa-bin-agg": "adult_mpa_bin_with_agg",
     "adult-mpa-bin-wout-agg": "adult_mpa_bin_wout_agg",
     "adult-mpa-cat-wout-agg": "adult_mpa_cat_wout_agg",
+    "german-mpa-bin-wout-agg": "german_mpa_bin_wout_agg",
 }
 VALID_FOLDER_NAMES = {
     "adult-mpa-bin-agg": "adult",
     "adult-mpa-bin-wout-agg": "adult",
     "adult-mpa-cat-wout-agg": "adult",
+    "german-mpa-bin-wout-agg": "german",
 }
 VALID_LEARNING_STEPS = ["train", "valid", "test"]
 ACCESS_INDEXES = {
@@ -24,12 +31,14 @@ ACCESS_INDEXES = {
     "adult-mpa-bin-agg": [slice(-1), -1, 1],  # Em casos com agg tem apenas um A
     "adult-mpa-bin-wout-agg": [slice(-1), -1, 1, 2],
     "adult-mpa-cat-wout-agg": [slice(-1), -1, 1, slice(2, 7)],
+    "german-mpa-bin-wout-agg": [slice(-1), -1, 0, 1],  # A1 gender A2 age
 }
 DIMENSIONS = {
     # dataset-name: [X, Y, A1, A2]
     "adult-mpa-bin-agg": [116, 1, 1],
     "adult-mpa-bin-wout-agg": [97, 1, 1, 1],
     "adult-mpa-cat-wout-agg": [102, 1, 1, 5],
+    "german-mpa-bin-wout-agg": [28, 1, 1, 1],
 }
 
 
