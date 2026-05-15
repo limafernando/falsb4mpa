@@ -1,0 +1,2 @@
+,model_name,cv_seed,clas_acc,f1-micro,f1-macro,a1_dp,a1_deqodds,a1_deqopp,a1_TN_g0,a1_FP_g0,a1_FN_g0,a1_TP_g0,a1_TN_g1,a1_FP_g1,a1_FN_g1,a1_TP_g1,a2_dp,a2_deqodds,a2_deqopp,a2_TN_g0,a2_FP_g0,a2_FN_g0,a2_TP_g0,a2_TN_g1,a2_FP_g1,a2_FN_g1,a2_TP_g1,wc_spd,wc_aod,wc_eod,last_cosine_similarity
+0,MultAdvBin4EqOdds,13,0.8376037,0.837603672985782,0.774710391133296,0.79674447,0.89575344,0.8963446,5459.0,830.0,1021.0,1814.0,3764.0,105.0,237.0,274.0,0.85415226,0.88386863,0.8454674,7653.0,892.0,1102.0,1942.0,1570.0,43.0,156.0,146.0,0.7259258,0.77563596,0.6879611,0.22989431
