@@ -12,18 +12,24 @@ VALID_DATA_NAMES = [
     "adult-mpa-bin-wout-agg",
     "adult-mpa-cat-wout-agg",
     "german-mpa-bin-wout-agg",
+    "compas-mpa-bin-wout-agg",
+    "compas-mpa-cat-wout-agg",
 ]
 VALID_FILE_NAMES = {
     "adult-mpa-bin-agg": "adult_mpa_bin_with_agg",
     "adult-mpa-bin-wout-agg": "adult_mpa_bin_wout_agg",
     "adult-mpa-cat-wout-agg": "adult_mpa_cat_wout_agg",
     "german-mpa-bin-wout-agg": "german_mpa_bin_wout_agg",
+    "compas-mpa-bin-wout-agg": "compas_mpa_bin_wout_agg",
+    "compas-mpa-cat-wout-agg": "compas_mpa_cat_wout_agg",
 }
 VALID_FOLDER_NAMES = {
     "adult-mpa-bin-agg": "adult",
     "adult-mpa-bin-wout-agg": "adult",
     "adult-mpa-cat-wout-agg": "adult",
     "german-mpa-bin-wout-agg": "german",
+    "compas-mpa-bin-wout-agg": "compas",
+    "compas-mpa-cat-wout-agg": "compas",
 }
 VALID_LEARNING_STEPS = ["train", "valid", "test"]
 ACCESS_INDEXES = {
@@ -32,6 +38,8 @@ ACCESS_INDEXES = {
     "adult-mpa-bin-wout-agg": [slice(-1), -1, 1, 2],
     "adult-mpa-cat-wout-agg": [slice(-1), -1, 1, slice(2, 7)],
     "german-mpa-bin-wout-agg": [slice(-1), -1, 0, 1],  # A1 gender A2 age
+    "compas-mpa-bin-wout-agg": [slice(-1), -1, 0, 1],  # A1 gender A2 race
+    "compas-mpa-cat-wout-agg": [slice(-1), -1, 0, slice(1, 7)],  # A1 gender A2 race
 }
 DIMENSIONS = {
     # dataset-name: [X, Y, A1, A2]
@@ -39,6 +47,8 @@ DIMENSIONS = {
     "adult-mpa-bin-wout-agg": [97, 1, 1, 1],
     "adult-mpa-cat-wout-agg": [102, 1, 1, 5],
     "german-mpa-bin-wout-agg": [28, 1, 1, 1],
+    "compas-mpa-bin-wout-agg": [11, 1, 1, 1],
+    "compas-mpa-cat-wout-agg": [18, 1, 1, 6],
 }
 
 
