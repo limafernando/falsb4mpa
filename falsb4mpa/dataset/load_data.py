@@ -35,8 +35,8 @@ VALID_LEARNING_STEPS = ["train", "valid", "test"]
 ACCESS_INDEXES = {
     # dataset-name: [X, Y, A1, A2] - A como subconjunto de X
     "adult-mpa-bin-agg": [slice(-1), -1, 1],  # Em casos com agg tem apenas um A
-    "adult-mpa-bin-wout-agg": [slice(-1), -1, 1, 2],
-    "adult-mpa-cat-wout-agg": [slice(-1), -1, 1, slice(2, 7)],
+    "adult-mpa-bin-wout-agg": [slice(-1), -1, 1, 2], # A1 gender A2 race
+    "adult-mpa-cat-wout-agg": [slice(-1), -1, 1, slice(2, 7)], # A1 gender A2 race
     "german-mpa-bin-wout-agg": [slice(-1), -1, 0, 1],  # A1 gender A2 age
     "compas-mpa-bin-wout-agg": [slice(-1), -1, 0, 1],  # A1 gender A2 race
     "compas-mpa-cat-wout-agg": [slice(-1), -1, 0, slice(1, 7)],  # A1 gender A2 race
